@@ -23,13 +23,17 @@ const getNotes = (userId) => {
 };
 
 const renderDataAsHtml = (data) => {
-  let cards = ``;
-  for (const noteItem in data) {
+    let cards = ``;
+    let modifiedData = Object.fromEntries(Object.entries(data).sort(function(a,b) {
+        var x = a[1].title.toLowerCase();
+        var y = b[1].title.toLowerCase();
+        return x < y ? -1 : x > y ? 1 : 0;
+    }));
+
+  for (const noteItem in modifiedData) {
     const note = data[noteItem];
-    // For each note create an HTML card
     cards += createCard(note, noteItem)
   };
-  // Inject our string of HTML into our viewNotes.html page
   document.querySelector('#app').innerHTML = cards;
 };
 
@@ -58,7 +62,23 @@ const createCard = (note, noteId) => {
 }
 
 const deleteNote = (noteId) => {
-    firebase.database().ref(`users/${googleUserId}/${noteId}`).remove();
+    if(confirm("Are you sure you want to delete this note?")){
+        //OUR ATTEMPT AT DOING THE SPICY ONE
+        // let noteDetails;
+        // const notesRef = firebase.database().ref(`users/${googleUserId}/${noteId}`);
+        // notesRef.on('value', (snapshot) => {
+        //     const data = snapshot.val();
+        //     console.log(data)
+        //     const noteEdits = {
+        //         labels: [...data.labels, "archived"]
+        //     };
+        
+        //     firebase.database().ref(`users/${googleUserId}/${noteId}`).update(noteEdits);
+        // });
+        firebase.database().ref(`users/${googleUserId}/${noteId}`).remove();
+    } else {
+        alert("Deletion cancelled!");
+    }
 }
 const editNote = (noteId) => {
     const editNoteModal = document.querySelector('#editNoteModal');
@@ -83,7 +103,7 @@ const saveEditedNote = () => {
         title: noteTitle,
         text: noteText,
     };
-    
+
     firebase.database().ref(`users/${googleUserId}/${noteId}`).update(noteEdits);
     closeEditedNote();
 }
