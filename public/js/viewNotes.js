@@ -108,6 +108,6 @@ const saveEditedNote = () => {
     closeEditedNote();
 }
 
-const closeEditedNote = () => {
+const closeEditModal = () => {
     editNoteModal = document.querySelector('#editNoteModal').classList.toggle('is-active');
 }
