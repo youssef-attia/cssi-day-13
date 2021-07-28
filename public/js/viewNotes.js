@@ -27,13 +27,13 @@ const renderDataAsHtml = (data) => {
   for (const noteItem in data) {
     const note = data[noteItem];
     // For each note create an HTML card
-    cards += createCard(note)
+    cards += createCard(note, noteItem)
   };
   // Inject our string of HTML into our viewNotes.html page
   document.querySelector('#app').innerHTML = cards;
 };
 
-const createCard = (note) => {
+const createCard = (note, noteId) => {
   return `
     <div class="column is-one-quarter">
       <div class="card">
@@ -43,7 +43,51 @@ const createCard = (note) => {
         <div class="card-content">
           <div class="content">${note.text}</div>
         </div>
+        <footer class="card-footer">
+            <a id="${noteId}" href="#" class="card-footer-item"
+                onclick="deleteNote('${noteId}')">
+                Delete
+            </a>
+            <a id="${noteId}" class="card-footer-item" onclick="editNote('${noteId}')">
+               Edit
+            </a>
+        </footer>
       </div>
     </div>
   `;
+}
+
+const deleteNote = (noteId) => {
+    firebase.database().ref(`users/${googleUserId}/${noteId}`).remove();
+}
+const editNote = (noteId) => {
+    const editNoteModal = document.querySelector('#editNoteModal');
+    const notesRef = firebase.database().ref(`users/${googleUserId}`);
+
+    notesRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        const noteDetails = data[noteId];
+        document.querySelector('#editTitleInput').value = noteDetails.title;
+        document.querySelector('#editTextInput').value = noteDetails.text;
+        document.querySelector('#editTextId').value = noteId;
+    });
+    editNoteModal.classList.toggle('is-active');
+
+}
+
+const saveEditedNote = () => {
+    const noteTitle = document.querySelector("#editTitleInput").value;
+    const noteText = document.querySelector("#editTextInput").value;
+    const noteId = document.querySelector("#editTextId").value;
+    const noteEdits = {
+        title: noteTitle,
+        text: noteText,
+    };
+    
+    firebase.database().ref(`users/${googleUserId}/${noteId}`).update(noteEdits);
+    closeEditedNote();
+}
+
+const closeEditedNote = () => {
+    editNoteModal = document.querySelector('#editNoteModal').classList.toggle('is-active');
 }
