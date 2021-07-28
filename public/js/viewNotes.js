@@ -1,13 +1,13 @@
 window.onload = (event) => {
   // Use this to retain user state between html pages.
-  firebase.auth().onAuthStateChanged(function(user) {
+  firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
       console.log('Logged in as: ' + user.displayName);
       const googleUserId = user.uid;
       getNotes(googleUserId);
     } else {
       // If not logged in, navigate back to login page.
-      window.location = 'index.html'; 
+      window.location = 'index.html';
     };
   });
 };
@@ -22,7 +22,7 @@ const getNotes = (userId) => {
 
 const renderDataAsHtml = (data) => {
   let cards = ``;
-  for(const noteItem in data) {
+  for (const noteItem in data) {
     const note = data[noteItem];
     // For each note create an HTML card
     cards += createCard(note)
@@ -32,16 +32,16 @@ const renderDataAsHtml = (data) => {
 };
 
 const createCard = (note) => {
-    return `
-        <div class="column is-one-quarter">
-            <div class="card">
-                <header class="card-header">
-                    <p class="card-header-title">${note.title}</p>
-                </header>
-                <div class="card-content">
-                    <div class="content">${note.text}</div>
-                </div>
-            </div>
+  return `
+    <div class="column is-one-quarter">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">${note.title}</p>
+        </header>
+        <div class="card-content">
+          <div class="content">${note.text}</div>
         </div>
-    `;
+      </div>
+    </div>
+  `;
 }
